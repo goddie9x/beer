@@ -11,7 +11,7 @@
                     <div class="form-group">
                         <label for="timeStart">Từ ngày</label>
                         <input type="text" class="form-control date-time-picker" id="timeStart" name="timeStart"
-                            placeholder="Nhập ngày bắt đầu"  required>
+                            placeholder="Nhập ngày bắt đầu" required>
                         <div class="valid-feedback">
                             Bạn phải nhập thời gian bắt đầu
                         </div>
@@ -44,7 +44,7 @@
                         <select class="form-control select2 without-location" id="unit" name="unit">
                             <option value="">Chọn đơn vị</option>
                             @foreach ($units as $unit)
-                                <option value="{{ $unit->id }}">{{ $unit->describe_vi }}</option>
+                                <option value="{{ $unit->describe_vi }}">{{ $unit->describe_vi }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 <div class="confim-container text-center my-2">
-                    <div class="btn btn-primary" onclick="testApi(event)">Xác nhận</div>
+                    <div class="btn btn-primary get-chart disabled" >Xác nhận</div>
                 </div>
             </div>
         </div>
@@ -86,11 +86,24 @@
         <script src="{{ URL::asset('js/jquery.datetimepicker.full.min.js') }}"></script>
         <script src="{{ URL::asset('js/chartHandle.js') }}"></script>
         <script>
+            let charts=[];
             $(document).ready(function() {
                 let location = $('#location');
                 let allOptionWithoutLocation = $('.without-location');
+                let dateTimePickers = $('.date-time-picker');
+                $('.get-chart').unbind().click(getCharts);
                 $('.select2').select2();
-                $('.date-time-picker').datetimepicker({format:'Y-m-d H:m'});
+                dateTimePickers.datetimepicker({
+                    format: 'Y-m-d H:m'
+                });
+                dateTimePickers.on('change',function(e){
+                    let timeStart = $('#timeStart').val();
+                    if(timeStart){
+                        $('.get-chart').removeClass('disabled');
+                    }else{
+                        $('.get-chart').addClass('disabled');
+                    }
+                });
                 location.on('change', function(e) {
                     let selected = location.val();
                     console.log(selected);
@@ -102,20 +115,10 @@
                     }
                 });
             });
-            /* $(document).ready(function() {
-                let arrayChartTest = [];
-                for(let i = 0; i < 10; i++) {
-                    let chartTest = new ChartWithTemplature('chartId'+i, {
-                        chartSeriesTemp,
-                        chartSeriesTimes
-                    });
-                    arrayChartTest.push(chartTest);
-                }
-                arrayChartTest.forEach(function(item, index){
-                    
-                });
-            }); */
-            function testApi() {
+
+            function getCharts() {
+                charts = [];
+                $('.chart-area').empty();
                 const timeStartElement = $('#timeStart');
                 const timeEndElement = $('#timeEnd');
                 const timeStart = timeStartElement.val();
@@ -144,14 +147,10 @@
                         "_token": "{{ csrf_token() }}",
                     },
                     success: function(data) {
-                        console.log(data);
-                        let chartArea = $('.chart-area');
-                        chartArea.empty();
-                        let chart = new Chart('chartId', {
-                            chartSeriesTemp: data.chartSeriesTemp,
-                            chartSeriesTimes: data.chartSeriesTimes
-                        });
-                        chartArea.append(chart.render());
+                        for (const [key, value] of Object.entries(data)) {
+                            let chart = new Chart(key, value);
+                            charts.push(chart);
+                        }
                     }
                 });
             }

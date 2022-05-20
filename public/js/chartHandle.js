@@ -18,21 +18,28 @@ const unitList = {
 };
 class Chart {
     constructor(chartId, {
-        chartSeriesValues,
-        chartSeriesTimes,
+        values,
+        times,
         unit,
+        name,
+        object,
+        description,
     }, chartContainer = '.chart-area') {
         this.chartId = chartId;
         this.chartContainer = chartContainer;
-        if (chartSeriesValues.length != chartSeriesTimes.length) {
-            console.log('Error: chartSeriesValues and chartSeriesTimes must have the same length');
-            return;
-        }
+        this.name = name;
+        this.object = object;
+        this.description = description;
         this.unit = unitList[unit].unit;
         this.unitName = unitList[unit].name;
+
+        if (values.length != times.length) {
+            console.log('Error: values and times must have the same length');
+            return;
+        }
         this.initChart();
-        this.chartSeriesXY = chartSeriesValues.map((item, index) => {
-            return [chartSeriesTimes[index], parseFloat(item)];
+        this.chartSeriesXY = values.map((item, index) => {
+            return [times[index], parseFloat(item)];
         });
         this.unit = unitList[unit].unit;
         this.unitName = unitList[unit].name;
@@ -40,8 +47,11 @@ class Chart {
         this._this = this;
     }
     initChart() {
-        if ($(this.chartId).length <= 0) {
-            $(this.chartContainer).prepend('<div id="' + this.chartId + '""></div>');
+        let container = document.querySelector(this.chartContainer);
+        if (!document.querySelector(this.chartId)) {
+            let div = document.createElement('div');
+            div.id = this.chartId;
+            container.appendChild(div);
         }
         this.currentChart = Highcharts.chart(this.chartId, {
             chart: {
@@ -52,11 +62,11 @@ class Chart {
                 }
             },
             title: {
-                text: 'Templature',
+                text: this.name,
                 align: 'left'
             },
             subtitle: {
-                text: 'For today',
+                text: this.object,
                 align: 'left'
             },
             xAxis: {
@@ -124,14 +134,14 @@ class Chart {
                 }
             },
             series: [{
-                name: 'Hestavollane',
+                name: this.description,
                 data: this.chartSeriesXY
             }],
             navigation: {
                 menuItemStyle: {
                     fontSize: '10px'
                 }
-            }
+            },
         });
     }
     setTitle(title) {
