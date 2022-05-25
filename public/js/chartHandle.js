@@ -24,6 +24,7 @@ class Chart {
         name,
         object,
         description,
+        //threshold,
     }, chartContainer = '.chart-area') {
         this.chartId = chartId;
         this.chartContainer = chartContainer;
@@ -32,6 +33,9 @@ class Chart {
         this.description = description;
         this.unit = unitList[unit].unit;
         this.unitName = unitList[unit].name;
+        //this.dateStart = times[0];
+        /* 
+                this.threshold = threshold; */
 
         if (values.length != times.length) {
             console.log('Error: values and times must have the same length');
@@ -48,6 +52,7 @@ class Chart {
     }
     initChart() {
         let container = document.querySelector(this.chartContainer);
+        let containerWidth = container.offsetWidth;
         if (!document.querySelector(this.chartId)) {
             let div = document.createElement('div');
             div.id = this.chartId;
@@ -57,9 +62,10 @@ class Chart {
             chart: {
                 type: 'spline',
                 scrollablePlotArea: {
-                    minWidth: 600,
+                    minWidth: 300,
                     scrollPositionX: 1
-                }
+                },
+                width: containerWidth,
             },
             title: {
                 text: this.name,
@@ -72,7 +78,8 @@ class Chart {
             xAxis: {
                 type: 'datetime',
                 labels: {
-                    overflow: 'justify'
+                    overflow: 'justify',
+                    format: '{value:%b-%e %l:%M %p }',
                 }
             },
             yAxis: {
@@ -129,7 +136,7 @@ class Chart {
                         enabled: false
                     },
                     //pointInterval: 60000, // one minute
-                    //pointStart: Date.UTC(2021, 11, 15, 3, 59, 0),
+                    // pointStart: new Date(this.dateStart),
                     relativeXValue: true
                 }
             },
@@ -167,29 +174,32 @@ class Chart {
     }
     addChartData(series) {
         series.forEach(function(item, index) {
-            currentChart.series[index].setData(item);
+            this.currentChart.series[index].setData(item);
         });
-        currentChart.redraw();
+        this.currentChart.redraw();
     }
     removeChartData(index) {
-        currentChart.series[index].remove(false);
-        currentChart.redraw();
+        this.currentChart.series[index].remove(false);
+        this.currentChart.redraw();
     }
     switchChartType(type) {
-        currentChart.update({
+        this.currentChart.update({
             chart: {
                 type: type
             }
         });
     }
+    setWidth(width) {
+        this.currentChart.setSize(width);
+    }
     removeAllSeries = function() {
-        currentChart.series.forEach(function(item, index) {
-            currentChart.series[index].remove(false);
+        this.currentChart.series.forEach(function(item, index) {
+            this.currentChart.series[index].remove(false);
         });
-        currentChart.redraw();
+        this.currentChart.redraw();
     }
     remove() {
-        currentChart.destroy();
+        this.currentChart.destroy();
         $(chartId).remove();
     }
 }

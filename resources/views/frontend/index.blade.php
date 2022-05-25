@@ -72,11 +72,30 @@
                     </div>
                 </div>
                 <div class="confim-container text-center my-2">
-                    <div class="btn btn-primary get-chart disabled" >Xác nhận</div>
+                    <div class="btn btn-primary get-chart disabled" data-bs-toggle="modal" data-bs-target="#loading-modal">
+                        Xác nhận</div>
+                </div>
+            </div>
+            <div class="modal fade loading-modal " id="loading-modal" tabindex="-1" aria-labelledby="loading-modal"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered text-center justify-content-center">
+                    <div class="spinner-border text-success text-center" role="status">
+                        <span class="sr-only"></span>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="chart-area">
+        <div class="d-lg-flex justify-content-end d-none grid-mode text-right">
+            <div class="col-lg-4">
+                <select class="form-control select-grid-view " id="select-grid-view" name="select-grid-view">
+                    <option value="1">Chọn chế độ xem</option>
+                    <option value="3">3 biểu đồ/ hàng</option>
+                    <option value="2">2 biểu đồ/ hàng</option>
+                    <option value="1">1 biểu đồ/ hàng</option>
+                </select>
+            </div>
+        </div>
+        <div class="chart-area d-flex  flex-wrap">
         </div>
     @endsection
     @section('js')
@@ -86,27 +105,36 @@
         <script src="{{ URL::asset('js/jquery.datetimepicker.full.min.js') }}"></script>
         <script src="{{ URL::asset('js/chartHandle.js') }}"></script>
         <script>
-            let charts=[];
+            let charts = [];
             $(document).ready(function() {
                 let location = $('#location');
                 let allOptionWithoutLocation = $('.without-location');
                 let dateTimePickers = $('.date-time-picker');
+
                 $('.get-chart').unbind().click(getCharts);
                 $('.select2').select2();
-                dateTimePickers.datetimepicker({
-                    format: 'Y-m-d H:m'
+                $('.select-grid-view').change(function() {
+                    let chartPerRow = $(this).val();
+                    const chartArea = document.querySelector('.chart-area');
+                    let chartItemWidth = Math.floor(chartArea.offsetWidth / chartPerRow);
+                    charts.forEach(function(chart) {
+                        chart.setWidth(chartItemWidth);
+                    });
                 });
-                dateTimePickers.on('change',function(e){
+
+                dateTimePickers.datetimepicker({
+                    format: 'Y-m-d H:m:s'
+                });
+                dateTimePickers.on('change', function(e) {
                     let timeStart = $('#timeStart').val();
-                    if(timeStart){
+                    if (timeStart) {
                         $('.get-chart').removeClass('disabled');
-                    }else{
+                    } else {
                         $('.get-chart').addClass('disabled');
                     }
                 });
                 location.on('change', function(e) {
                     let selected = location.val();
-                    console.log(selected);
                     if (selected) {
                         allOptionWithoutLocation.val('').trigger('change');
                         allOptionWithoutLocation.prop('disabled', true);
@@ -119,6 +147,7 @@
             function getCharts() {
                 charts = [];
                 $('.chart-area').empty();
+                const getChartBtn = $('.get-chart');
                 const timeStartElement = $('#timeStart');
                 const timeEndElement = $('#timeEnd');
                 const timeStart = timeStartElement.val();
@@ -126,9 +155,7 @@
                 if (!timeStart) {
                     return;
                 }
-                if (!timeEnd) {
-                    return;
-                }
+                getChartBtn.addClass('disabled');
                 const device = $('#device').val();
                 const unit = $('#unit').val();
                 const location = $('#location').val();
@@ -147,10 +174,17 @@
                         "_token": "{{ csrf_token() }}",
                     },
                     success: function(data) {
+                        charts = [];
                         for (const [key, value] of Object.entries(data)) {
                             let chart = new Chart(key, value);
                             charts.push(chart);
                         }
+                        $('.loading-modal').click();
+                        getChartBtn.removeClass('disabled');
+                    },
+                    error: function(data) {
+                        $('.loading-modal').click();
+                        getChartBtn.removeClass('disabled');
                     }
                 });
             }

@@ -24,23 +24,24 @@ class IndexController extends Controller
     {
         $timeStart = $request->timeStart;
         $timeEnd = $request->timeEnd;
-
         if($timeEnd == ''){
             $timeEnd = date('Y-m-d H:i:s');
         }
         $period = strtotime($timeEnd) - strtotime($timeStart);
-        $raw_data = (new TimeAnalog)->getAnalog($timeStart,$timeEnd,$request->device,$request->unit,$request->locationID,$request->objectID);
         $data = [];
-
+        if($period<0){
+            return response()->json($data);
+        }
+        $raw_data = (new TimeAnalog)->getAnalog($timeStart,$timeEnd,$request->device,$request->unit,$request->locationID,$request->objectID);
         foreach ($raw_data as $key=>$value) {
             $device_name = $value['Dev_Name'];
             if(isset($data[$device_name])){
                 $time = $value['Recordtime'];
-                /* $timeToSeconds = strtotime($time); 
-                if(periodConditionHandle($period, $timeToSeconds)){ */
+                $timeToSeconds = strtotime($time);
+                if(periodConditionHandle($timeToSeconds, $period)){
                     array_push($data[$device_name]['values'],$value['Value']);
                     array_push($data[$device_name]['times'],$time);
-                //}
+                } 
             }
             else{
                 $data[$device_name] = [
@@ -57,21 +58,19 @@ class IndexController extends Controller
     }
 }
 function periodConditionHandle($time,$period){
-    $damage;
-    if($period<3600){
+    $damage = 0;
+    if($period<7200){
         $damage = $time%60;
-        return  $damage<=30;
+        return  $damage>=10&&$damage<=30;
     }
-    else if($period<86400){
+    if($period<86400){
         $damage = $time%1800;
-        return  $damage<=800;
+        return  $damage>=10&&$damage<=30;
     }
-    else if($period<604800){
+    if($period<604800){
         $damage = $time%7200;
-        return  $damage<=800;
+        return  $damage>=10&&$damage<=30;
     }
-    else{
-        $damage = $time%7200;
-        return  $damage<=800;
-    }
+    $damage = $time%43200;
+    return  $damage>=10&&$damage<=30;
 }
