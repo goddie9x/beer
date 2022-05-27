@@ -20,3 +20,5 @@ Route::group(['namespace'=>'Frontend'],function(){
     Route::get('/', 'IndexController@index');
     Route::post('/', 'IndexController@getAnalog')->name('frontend.getAnalog');
 });
+
+Auth::routes();

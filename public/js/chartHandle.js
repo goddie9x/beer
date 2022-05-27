@@ -24,6 +24,7 @@ class Chart {
         name,
         object,
         description,
+        timeInterval,
         //threshold,
     }, chartContainer = '.chart-area') {
         this.chartId = chartId;
@@ -33,7 +34,8 @@ class Chart {
         this.description = description;
         this.unit = unitList[unit].unit;
         this.unitName = unitList[unit].name;
-        //this.dateStart = times[0];
+        this.timeInterval = timeInterval;
+        this.dateStart = times[0];
         /* 
                 this.threshold = threshold; */
 
@@ -80,7 +82,8 @@ class Chart {
                 labels: {
                     overflow: 'justify',
                     format: '{value:%b-%e %l:%M %p }',
-                }
+                },
+                relativeXValue: true
             },
             yAxis: {
                 title: {
@@ -135,8 +138,8 @@ class Chart {
                     marker: {
                         enabled: false
                     },
-                    //pointInterval: 60000, // one minute
-                    // pointStart: new Date(this.dateStart),
+                    pointInterval: this.timeInterval,
+                    //pointStart: new Date(this.dateStart),
                     relativeXValue: true
                 }
             },

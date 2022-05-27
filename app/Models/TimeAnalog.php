@@ -30,6 +30,7 @@ class TimeAnalog extends Model
         ->select('Device.Dev_Name','Device.Dev_Des','Object.Obj_Name','Time_Analog.Value', 'Time_Analog.Recordtime','Device.Dev_Unit')
         ->where($where)
         ->whereBetween('Time_Analog.Recordtime', [$timeStart, $timeEnd])
+        ->orderBy('Time_Analog.Recordtime')
         ->get();
     }
     public function getAnalogWithPeriord($timeStart,$timeEnd='',$device='',$unit='', $locationID='',$objectID=''){

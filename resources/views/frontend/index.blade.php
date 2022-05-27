@@ -106,6 +106,7 @@
         <script src="{{ URL::asset('js/chartHandle.js') }}"></script>
         <script>
             let charts = [];
+            let chartPerRow = 1;
             $(document).ready(function() {
                 let location = $('#location');
                 let allOptionWithoutLocation = $('.without-location');
@@ -113,14 +114,7 @@
 
                 $('.get-chart').unbind().click(getCharts);
                 $('.select2').select2();
-                $('.select-grid-view').change(function() {
-                    let chartPerRow = $(this).val();
-                    const chartArea = document.querySelector('.chart-area');
-                    let chartItemWidth = Math.floor(chartArea.offsetWidth / chartPerRow);
-                    charts.forEach(function(chart) {
-                        chart.setWidth(chartItemWidth);
-                    });
-                });
+                $('.select-grid-view').change(setChartsRow);
 
                 dateTimePickers.datetimepicker({
                     format: 'Y-m-d H:m:s'
@@ -143,6 +137,15 @@
                     }
                 });
             });
+
+            function setChartsRow() {
+                let chartPerRow = $('.select-grid-view').val();
+                const chartArea = document.querySelector('.chart-area');
+                let chartItemWidth = Math.floor(chartArea.offsetWidth / chartPerRow);
+                charts.forEach(function(chart) {
+                    chart.setWidth(chartItemWidth);
+                });
+            }
 
             function getCharts() {
                 charts = [];
@@ -174,13 +177,15 @@
                         "_token": "{{ csrf_token() }}",
                     },
                     success: function(data) {
+                        $('.loading-modal').click();
+                        console.log($('.loading-modal'));
+                        getChartBtn.removeClass('disabled');
                         charts = [];
                         for (const [key, value] of Object.entries(data)) {
                             let chart = new Chart(key, value);
                             charts.push(chart);
                         }
-                        $('.loading-modal').click();
-                        getChartBtn.removeClass('disabled');
+                        setChartsRow();
                     },
                     error: function(data) {
                         $('.loading-modal').click();

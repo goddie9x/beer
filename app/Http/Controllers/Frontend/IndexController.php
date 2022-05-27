@@ -12,6 +12,15 @@ use Carbon\Carbon;
 
 class IndexController extends Controller
 {
+     /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+     public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function index()
     {
         $devices = Device::select('Dev_Name','DeviceID')->get();
@@ -51,6 +60,7 @@ class IndexController extends Controller
                     'object' => $raw_data[$key]['Obj_Name'],
                     'name' => $device_name,
                     'description' => $raw_data[$key]['Dev_Des'],
+                    'timeInterval' => floor($period/9)*1000,
                 ];
             }
         }
