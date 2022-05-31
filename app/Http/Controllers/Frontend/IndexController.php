@@ -53,12 +53,14 @@ class IndexController extends Controller
                 } 
             }
             else{
+                $device_id = $value['DeviceID'];
                 $data[$device_name] = [
                     'values' => [$value['Value']],
                     'times' => [$value['Recordtime']],
                     'unit' => $raw_data[$key]['Dev_Unit'],
                     'object' => $raw_data[$key]['Obj_Name'],
                     'name' => $device_name,
+                    'deviceId'=>$device_id,
                     'description' => $raw_data[$key]['Dev_Des'],
                     'timeInterval' => floor($period/9)*1000,
                 ];

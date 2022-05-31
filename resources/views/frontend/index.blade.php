@@ -85,7 +85,7 @@
                 </div>
             </div>
         </div>
-        <div class="d-lg-flex justify-content-end d-none grid-mode text-right">
+        <div class="d-lg-flex justify-content-end d-none grid-mode text-right my-3">
             <div class="col-lg-4">
                 <select class="form-control select-grid-view " id="select-grid-view" name="select-grid-view">
                     <option value="1">Chọn chế độ xem</option>
@@ -104,6 +104,7 @@
         <script src="{{ URL::asset('js/highcharts-exporting.js') }}"></script>
         <script src="{{ URL::asset('js/jquery.datetimepicker.full.min.js') }}"></script>
         <script src="{{ URL::asset('js/chartHandle.js') }}"></script>
+        <script src="{{ URL::asset('js/moment.min.js') }}"></script>
         <script>
             let charts = [];
             let chartPerRow = 1;
@@ -178,7 +179,6 @@
                     },
                     success: function(data) {
                         $('.loading-modal').click();
-                        console.log($('.loading-modal'));
                         getChartBtn.removeClass('disabled');
                         charts = [];
                         for (const [key, value] of Object.entries(data)) {

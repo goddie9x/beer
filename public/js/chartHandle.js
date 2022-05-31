@@ -1,3 +1,5 @@
+const PeriodTypes = ['hour', 'day', 'week', 'month', 'year'];
+const PeriodByTimestampMilisecond = [3600000, 86400000, 604800000, 2592000000, 31536000000];
 const unitList = {
     "oC": {
         name: "Templarature",
@@ -17,57 +19,90 @@ const unitList = {
     }
 };
 class Chart {
-    constructor(chartId, {
-        values,
-        times,
-        unit,
-        name,
-        object,
-        description,
-        timeInterval,
-        //threshold,
-    }, chartContainer = '.chart-area') {
+    constructor(chartId, data, chartContainer = '.chart-area') {
         this.chartId = chartId;
         this.chartContainer = chartContainer;
-        this.name = name;
-        this.object = object;
-        this.description = description;
-        this.unit = unitList[unit].unit;
-        this.unitName = unitList[unit].name;
-        this.timeInterval = timeInterval;
-        this.dateStart = times[0];
+        let isSetDataSuccess = this.setChartData(data);
+        if (!isSetDataSuccess) return;
+        this.optionPeriodElement = document.createElement('select');
+        this.optionPeriodElement.className = 'period-option form-control';
+        this.optionPeriodElement.setAttribute('forChartId', this.chartId);
+        this.chartWrapper = document.querySelector(this.chartId);
+        this.chartDiv = document.createElement('div');
+        this.chartDiv.className = 'chart-item';
+        this.chartDiv.id = this.chartId;
         /* 
                 this.threshold = threshold; */
 
-        if (values.length != times.length) {
-            console.log('Error: values and times must have the same length');
-            return;
+        this.initOption();
+    }
+    initOption() {
+        let _this = this;
+        let titleOption = document.createElement('option');
+        this.container = document.querySelector(this.chartContainer);
+
+        titleOption.innerHTML = 'select period';
+        _this.optionPeriodElement.appendChild(titleOption);
+        PeriodTypes.forEach(function(item, index) {
+            let optionElement = document.createElement('option');
+            optionElement.setAttribute('value', index);
+            optionElement.innerHTML = item;
+            _this.optionPeriodElement.appendChild(optionElement);
+        });
+        if (!this.chartWrapper) {
+            this.chartWrapper = document.createElement('div');
+            this.chartWrapper.className = 'chart-wrapper my-2 chart-wrapper-' + this.chartId;
+            this.container.appendChild(this.chartWrapper);
         }
-        this.initChart();
-        this.chartSeriesXY = values.map((item, index) => {
+        this.optionPeriodElement.addEventListener('change', function(e) {
+            let csrf_token = $('meta[name="csrf-token"]').attr('content');
+            let period = PeriodByTimestampMilisecond[e.target.value];
+            let newDateStart = (new Date(_this.dateStart)).getTime() + 25200000;
+            let newDateEndTimestamp = newDateStart + period;
+            let newDateEnd = new Date(newDateEndTimestamp);
+            newDateStart = new Date(newDateStart);
+            console.log(newDateStart.toISOString(), newDateEnd.toISOString());
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    timeStart: newDateStart.toISOString(),
+                    timeEnd: newDateEnd.toISOString(),
+                    device: _this.deviceId,
+                    _token: csrf_token,
+                })
+            }).then(function(response) {
+                return response.json();
+            }).then(function(data) {
+                _this.setChartData(data[_this.name]);
+                _this.currentChart = _this.initChart();
+                _this.currentChart.redraw();
+            }).catch(function(error) {
+                console.log(error);
+            });
+        });
+        this.chartWrapper.appendChild(this.optionPeriodElement);
+        this.chartWrapper.appendChild(this.chartDiv);
+        this.currentChart = this.initChart();
+    }
+    getChartSerialXYWithTimeAndValue(values, times) {
+        return values.map((item, index) => {
             return [times[index], parseFloat(item)];
         });
-        this.unit = unitList[unit].unit;
-        this.unitName = unitList[unit].name;
-        this.initChart();
-        this._this = this;
     }
     initChart() {
-        let container = document.querySelector(this.chartContainer);
-        let containerWidth = container.offsetWidth;
-        if (!document.querySelector(this.chartId)) {
-            let div = document.createElement('div');
-            div.id = this.chartId;
-            container.appendChild(div);
-        }
-        this.currentChart = Highcharts.chart(this.chartId, {
+        let containerWidth = this.container.offsetWidth;
+        this.chartPerRow = Math.floor(containerWidth / $('.select-grid-view').val()) || containerWidth;
+        return Highcharts.chart(this.chartId, {
             chart: {
                 type: 'spline',
                 scrollablePlotArea: {
                     minWidth: 300,
                     scrollPositionX: 1
                 },
-                width: containerWidth,
+                width: this.chartPerRow,
             },
             title: {
                 text: this.name,
@@ -165,21 +200,33 @@ class Chart {
             });
         }
         //index with replace special location, if not we replace all series in the chart
-    setChartData(data, index) {
-        if (index) {
-            this.currentChart.series[index].setData(data);
-            this.currentChart.redraw();
-        } else {
-            data.forEach(function(item, index) {
-                currentChart.series[index].setData(item);
-            });
+    setChartData({
+        values,
+        times,
+        unit,
+        name,
+        deviceId,
+        object,
+        description,
+        timeInterval,
+        //threshold,
+    }) {
+        this.name = name;
+        this.deviceId = deviceId;
+        this.object = object;
+        this.description = description;
+        this.unit = unitList[unit].unit;
+        this.unitName = unitList[unit].name;
+        this.timeInterval = timeInterval;
+        this.dateStart = times[0];
+        if (values.length != times.length) {
+            console.log('Error: values and times must have the same length');
+            return false;
         }
-    }
-    addChartData(series) {
-        series.forEach(function(item, index) {
-            this.currentChart.series[index].setData(item);
-        });
-        this.currentChart.redraw();
+        this.chartSeriesXY = this.getChartSerialXYWithTimeAndValue(values, times);
+        this.unit = unitList[unit].unit;
+        this.unitName = unitList[unit].name;
+        return true;
     }
     removeChartData(index) {
         this.currentChart.series[index].remove(false);
@@ -201,8 +248,14 @@ class Chart {
         });
         this.currentChart.redraw();
     }
+    redraw() {
+        this.currentChart.redraw();
+    }
+    destroyChart() {
+        this.currentChart.destroy();
+    }
     remove() {
         this.currentChart.destroy();
-        $(chartId).remove();
+        $(this.chartWrapper).remove();
     }
 }

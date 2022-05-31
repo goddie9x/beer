@@ -42,7 +42,7 @@
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <div class="nav-item">
                             <a class="navbar-brand" href="{{ url('/') }}">
-                                {{ config('app.name', 'Laravel') }}
+                                {{ config('app.name', 'Beer analystic') }}
                             </a>
                         </div>
                         <li class="nav-item">
