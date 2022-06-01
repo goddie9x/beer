@@ -190,6 +190,11 @@
                     error: function(data) {
                         $('.loading-modal').click();
                         getChartBtn.removeClass('disabled');
+                        showToast({
+                            type: 'danger',
+                            title: 'Lỗi',
+                            message: 'Không thể lấy dữ liệu',
+                        });
                     }
                 });
             }

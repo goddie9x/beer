@@ -94,10 +94,12 @@
             </nav>
         </div>
     </div>
+    <div class="toasts-container two-k-z-index position-fixed top-0 end-0 p-3"></div>
     @yield('content')
     <script src="{{ URL::asset('js/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ URL::asset('js/bootstrap.min.js') }}"></script>
     <script src="{{ URL::asset('js/select2.min.js') }}"></script>
+    <script src="{{ URL::asset('js/toastGenerate.js') }}"></script>
     <script src="{{ URL::asset('js/index.js') }}"></script>
     @yield('js')
 </body>

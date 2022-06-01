@@ -25,7 +25,7 @@ class Chart {
         let isSetDataSuccess = this.setChartData(data);
         if (!isSetDataSuccess) return;
         this.optionPeriodElement = document.createElement('select');
-        this.optionPeriodElement.className = 'period-option form-control';
+        this.optionPeriodElement.className = 'period-option form-select';
         this.optionPeriodElement.setAttribute('forChartId', this.chartId);
         this.chartWrapper = document.querySelector(this.chartId);
         this.chartDiv = document.createElement('div');
@@ -51,41 +51,52 @@ class Chart {
         });
         if (!this.chartWrapper) {
             this.chartWrapper = document.createElement('div');
-            this.chartWrapper.className = 'chart-wrapper my-2 chart-wrapper-' + this.chartId;
+            this.chartWrapper.className = 'chart-wrapper position-relative my-2 chart-wrapper-' + this.chartId;
             this.container.appendChild(this.chartWrapper);
         }
         this.optionPeriodElement.addEventListener('change', function(e) {
-            let csrf_token = $('meta[name="csrf-token"]').attr('content');
             let period = PeriodByTimestampMilisecond[e.target.value];
             let newDateStart = (new Date(_this.dateStart)).getTime() + 25200000;
             let newDateEndTimestamp = newDateStart + period;
             let newDateEnd = new Date(newDateEndTimestamp);
             newDateStart = new Date(newDateStart);
-            console.log(newDateStart.toISOString(), newDateEnd.toISOString());
-            fetch('/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    timeStart: newDateStart.toISOString(),
-                    timeEnd: newDateEnd.toISOString(),
-                    device: _this.deviceId,
-                    _token: csrf_token,
-                })
-            }).then(function(response) {
-                return response.json();
-            }).then(function(data) {
-                _this.setChartData(data[_this.name]);
-                _this.currentChart = _this.initChart();
-                _this.currentChart.redraw();
-            }).catch(function(error) {
-                console.log(error);
-            });
+            _this.handleChangePeriod(newDateStart, newDateEnd);
         });
         this.chartWrapper.appendChild(this.optionPeriodElement);
         this.chartWrapper.appendChild(this.chartDiv);
         this.currentChart = this.initChart();
+    }
+    handleChangePeriod(dateStart, dateEnd) {
+        const _this = this;
+        let csrf_token = $('meta[name="csrf-token"]').attr('content');
+        _this.showLoading();
+        fetch('/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                timeStart: dateStart.toISOString(),
+                timeEnd: dateEnd.toISOString(),
+                device: _this.deviceId,
+                _token: csrf_token,
+            })
+        }).then(function(response) {
+            return response.json();
+        }).then(function(data) {
+            _this.setChartData(data[_this.name]);
+            _this.currentChart = _this.initChart();
+            _this.currentChart.redraw();
+            _this.hideLoading();
+        }).catch(function(error) {
+            _this.hideLoading();
+            showToast({
+                type: 'danger',
+                title: 'Lỗi',
+                message: 'Không thể lấy dữ liệu',
+            });
+            console.log(error);
+        });
     }
     getChartSerialXYWithTimeAndValue(values, times) {
         return values.map((item, index) => {
@@ -93,6 +104,7 @@ class Chart {
         });
     }
     initChart() {
+        let _this = this;
         let containerWidth = this.container.offsetWidth;
         this.chartPerRow = Math.floor(containerWidth / $('.select-grid-view').val()) || containerWidth;
         return Highcharts.chart(this.chartId, {
@@ -176,6 +188,21 @@ class Chart {
                     pointInterval: this.timeInterval,
                     //pointStart: new Date(this.dateStart),
                     relativeXValue: true
+                },
+                series: {
+                    cursor: 'pointer',
+                    events: {
+                        click: function(event) {
+                            let period = _this.timeInterval;
+                            if (period >= 7200000) {
+                                let newDateStart = (new Date(event.point.name)).getTime() + 25200000 - period / 2;
+                                let newDateEndTimestamp = newDateStart + period;
+                                let newDateEnd = new Date(newDateEndTimestamp);
+                                newDateStart = new Date(newDateStart);
+                                _this.handleChangePeriod(newDateStart, newDateEnd);
+                            }
+                        }
+                    }
                 }
             },
             series: [{
@@ -188,6 +215,17 @@ class Chart {
                 }
             },
         });
+    }
+    showLoading() {
+        this.backdrop = document.createElement('div');
+        this.backdrop.className = 'backdrop position-absolute d-flex justify-content-center';
+        this.loading = document.createElement('div');
+        this.loading.className = 'spinner-border text-success align-self-center';
+        this.backdrop.appendChild(this.loading);
+        this.chartWrapper.appendChild(this.backdrop);
+    }
+    hideLoading() {
+        if (this.backdrop) this.chartWrapper.removeChild(this.backdrop);
     }
     setTitle(title) {
         this.currentChart.setTitle({
