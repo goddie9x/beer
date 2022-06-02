@@ -16,6 +16,7 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ URL::asset('css/bootstrap.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ URL::asset('css/all.min.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ URL::asset('css/select2.min.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ URL::asset('css/index.css') }}" type="text/css">
     @yield('css')

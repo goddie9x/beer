@@ -27,6 +27,9 @@ class Chart {
         this.optionPeriodElement = document.createElement('select');
         this.optionPeriodElement.className = 'period-option form-select';
         this.optionPeriodElement.setAttribute('forChartId', this.chartId);
+        this.zoomOutBtn = document.createElement('div');
+        this.zoomOutBtn.className = 'zoom-out-btn position-absolute btn';
+        this.zoomOutBtn.innerHTML = '<i class="fa-light fa-magnifying-glass-minus"></i>';
         this.chartWrapper = document.querySelector(this.chartId);
         this.chartDiv = document.createElement('div');
         this.chartDiv.className = 'chart-item';
@@ -55,6 +58,7 @@ class Chart {
             this.container.appendChild(this.chartWrapper);
         }
         this.optionPeriodElement.addEventListener('change', function(e) {
+            if(!e.target.value)return;
             let period = PeriodByTimestampMilisecond[e.target.value];
             let newDateStart = (new Date(_this.dateStart)).getTime() + 25200000;
             let newDateEndTimestamp = newDateStart + period;
@@ -62,8 +66,20 @@ class Chart {
             newDateStart = new Date(newDateStart);
             _this.handleChangePeriod(newDateStart, newDateEnd);
         });
+        this.zoomOutBtn.addEventListener('click', function(e) {
+            //the timeInterval is the part of interval in xAsix, by default it's 1/9 time of period
+            let period = _this.timeInterval * 81;
+            if (period <= 31536000000) {
+                let newDateStart = (new Date(_this.dateStart)).getTime() + 25200000 - period / 2;
+                let newDateEndTimestamp = newDateStart + period;
+                let newDateEnd = new Date(newDateEndTimestamp);
+                newDateStart = new Date(newDateStart);
+                _this.handleChangePeriod(newDateStart, newDateEnd);
+            }
+        });
         this.chartWrapper.appendChild(this.optionPeriodElement);
         this.chartWrapper.appendChild(this.chartDiv);
+        this.chartWrapper.appendChild(this.zoomOutBtn);
         this.currentChart = this.initChart();
     }
     handleChangePeriod(dateStart, dateEnd) {
