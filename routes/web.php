@@ -14,10 +14,13 @@ use Illuminate\Support\Facades\Route;
 */
 Route::group(['prefix'=>'admin','namespace'=>'Admin'/* ,'middleware'=>'loginAdmin' */],function(){
     Route::get('/', 'IndexController@index')->name('admin');
-    Route::post('/', 'IndexController@postAllUnit')->name('admin.postAllUnit');
+    Route::post('/initAllUnit', 'IndexController@initAllUnit')->name('admin.initAllUnit');
+    Route::post('/initThreshold', 'IndexController@initThreshold')->name('admin.initThreshold');
 });
-Route::group(['namespace'=>'Frontend'],function(){
+Route::group(['namespace'=>'frontend'],function(){
     Route::get('/', 'IndexController@index');
+    Route::get('/threshold', 'AlertController@index')->name('frontend.threshold');
+    Route::post('/setThreshold', 'AlertController@setThreshold')->name('frontend.setThreshold');
     Route::post('/', 'IndexController@getAnalog')->name('frontend.getAnalog');
 });
 

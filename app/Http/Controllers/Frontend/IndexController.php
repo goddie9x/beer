@@ -63,6 +63,8 @@ class IndexController extends Controller
                     'deviceId'=>$device_id,
                     'description' => $raw_data[$key]['Dev_Des'],
                     'timeInterval' => floor($period/9)*1000,
+                    'ceil' => $raw_data[$key]['t_ceil'],
+                    'floor' => $raw_data[$key]['t_floor'],
                 ];
             }
         }

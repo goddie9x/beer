@@ -41,13 +41,11 @@
                 </button>
                 <div class="collapse navbar-collapse" id="header-nav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <div class="nav-item">
-                            <a class="navbar-brand" href="{{ url('/') }}">
-                                {{ config('app.name', 'Beer analystic') }}
-                            </a>
-                        </div>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Triending</a>
+                            <a class="nav-link" aria-current="page" href="{{ url('/') }}">Triending</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('frontend.threshold') }}">Alert</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">Report</a>
@@ -103,6 +101,20 @@
     <script src="{{ URL::asset('js/toastGenerate.js') }}"></script>
     <script src="{{ URL::asset('js/index.js') }}"></script>
     @yield('js')
+    <script>
+        setActiveNav();
+        function setActiveNav(){
+            $('.nav-link').removeClass('active');
+            const url = window.location.href;
+            const urlWithoutLastSlash = url.substring(0, url.length - 1);
+            const nav_itemsWithoutSlash = $('a[href="'+urlWithoutLastSlash+'"]');
+            const nav_items = $('a[href="'+url+'"]');
+            nav_itemsWithoutSlash.addClass('active');
+            nav_itemsWithoutSlash.parent('.nav-link').addClass('active');
+            nav_items.addClass('active');
+            nav_items.parent('.nav-link').addClass('active');
+        }
+    </script>
 </body>
 
 </html>

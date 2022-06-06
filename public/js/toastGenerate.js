@@ -1,7 +1,6 @@
-function showToast({ type, title, message }, timeout = 600000, container = '.toasts-container') {
+function showToast({ type, title, message }, timeout = 6000, container = '.toasts-container') {
     let isClosed = false;
     let toastContainer = document.querySelector(container);
-    console.log(toastContainer);
     let toast = document.createElement('div');
     let toastClose = document.createElement('button');
     toastClose.className = 'btn-close position-absolute top-0 end-0 p-2';

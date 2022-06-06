@@ -58,7 +58,7 @@ class Chart {
             this.container.appendChild(this.chartWrapper);
         }
         this.optionPeriodElement.addEventListener('change', function(e) {
-            if(!e.target.value)return;
+            if (!e.target.value) return;
             let period = PeriodByTimestampMilisecond[e.target.value];
             let newDateStart = (new Date(_this.dateStart)).getTime() + 25200000;
             let newDateEndTimestamp = newDateStart + period;
@@ -152,40 +152,66 @@ class Chart {
                 title: {
                     text: this.unitName + ' ( ' + this.unit + ')'
                 },
+                visible: true,
                 minorGridLineWidth: 0,
                 gridLineWidth: 0,
                 alternateGridColor: null,
-                /*plotBands: [{ // Cooler
-                    from: -5,
-                    to: -3,
-                    color: 'rgba(68, 170, 213, 0.1)',
-                    label: {
-                        text: 'Cooler',
-                        style: {
-                            color: '#606060'
-                        }
-                    }
-                }, { // Normal
-                    from: -3,
-                    to: -1,
-                    color: 'rgba(0, 0, 0, 0)',
-                    label: {
-                        text: 'Normal',
-                        style: {
-                            color: '#606060'
-                        }
-                    }
-                }, { // Warm
-                    from: -1,
-                    to: 3,
-                    color: 'rgba(68, 170, 213, 0.1)',
-                    label: {
-                        text: 'Warm',
-                        style: {
-                            color: '#606060'
-                        }
-                    }
-                }]*/
+                /*  plotBands: [{ //  threshold floor
+                     from: parseFloat(this.min),
+                     to: parseFloat(this.floor),
+                     color: 'rgba(68, 170, 213, 0.1)',
+                     label: {
+                         text: 'Low',
+                         style: {
+                             color: '#606060'
+                         }
+                     }
+                 }, { // Normal
+                     from: parseFloat(this.floor),
+                     to: parseFloat(this.ceil),
+                     color: 'rgba(0, 0, 0, 0)',
+                     label: {
+                         text: 'Normal',
+                         style: {
+                             color: '#606060'
+                         }
+                     }
+                 }, { // Threshold ceil
+                     from: parseFloat(this.ceil),
+                     to: parseFloat(this.max),
+                     color: 'rgba(68, 170, 213, 0.1)',
+                     label: {
+                         text: 'High',
+                         style: {
+                             color: '#606060'
+                         }
+                     }
+                 }], */
+                plotLines: [{
+                        //low threshold
+                        value: parseFloat(this.floor),
+                        width: 2,
+                        color: 'blue',
+                        label: {
+                            text: this.unitName + ' low threshold: ' + this.floor + ' (' + this.unit + ')',
+                            align: 'right',
+                            y: 12,
+                            x: 0
+                        },
+                    },
+                    {
+                        //high threshold
+                        value: parseFloat(this.ceil),
+                        width: 2,
+                        color: 'red',
+                        label: {
+                            text: this.unitName + ' high threshold: ' + this.ceil + ' (' + this.unit + ')',
+                            align: 'right',
+                            y: 12,
+                            x: 0
+                        },
+                    },
+                ],
             },
             tooltip: {
                 valueSuffix: this.unit
@@ -263,6 +289,8 @@ class Chart {
         object,
         description,
         timeInterval,
+        ceil,
+        floor,
         //threshold,
     }) {
         this.name = name;
@@ -280,6 +308,8 @@ class Chart {
         this.chartSeriesXY = this.getChartSerialXYWithTimeAndValue(values, times);
         this.unit = unitList[unit].unit;
         this.unitName = unitList[unit].name;
+        this.ceil = ceil;
+        this.floor = floor;
         return true;
     }
     removeChartData(index) {
