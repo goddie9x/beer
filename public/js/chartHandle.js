@@ -42,6 +42,7 @@ class Chart {
     initOption() {
         let _this = this;
         let titleOption = document.createElement('option');
+        titleOption.value = -1;
         this.container = document.querySelector(this.chartContainer);
 
         titleOption.innerHTML = 'select period';
@@ -58,7 +59,7 @@ class Chart {
             this.container.appendChild(this.chartWrapper);
         }
         this.optionPeriodElement.addEventListener('change', function(e) {
-            if (!e.target.value) return;
+            if (e.target.value < 0) return;
             let period = PeriodByTimestampMilisecond[e.target.value];
             let newDateStart = (new Date(_this.dateStart)).getTime() + 25200000;
             let newDateEndTimestamp = newDateStart + period;
