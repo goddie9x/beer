@@ -17,11 +17,14 @@ class AlertController extends Controller
     {
         $this->middleware('auth');
     }
-
-    public function index()
+    public function index(Type $var = null)
     {
-        $thresholds = (new Threshold())->getAllThresHoldInfo();
-        return view('frontend.alert', compact('thresholds'));
+        return view('frontend.alert');
+    }
+    public function getAllThreshold()
+    {
+        $thresholds = (new Threshold())->getAllThresholdInfo();
+        return view('frontend.thresholdConfig', compact('thresholds'));
     }
     public function setThreshold(Request $request)
     {

@@ -19,7 +19,8 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'/* ,'middleware'=>'loginAdmi
 });
 Route::group(['namespace'=>'frontend'],function(){
     Route::get('/', 'IndexController@index');
-    Route::get('/threshold', 'AlertController@index')->name('frontend.threshold');
+    Route::get('/alert', 'AlertController@index')->name('frontend.alert');
+    Route::get('/threshold', 'AlertController@getAllThreshold')->name('frontend.threshold');
     Route::post('/setThreshold', 'AlertController@setThreshold')->name('frontend.setThreshold');
     Route::post('/', 'IndexController@getAnalog')->name('frontend.getAnalog');
 });

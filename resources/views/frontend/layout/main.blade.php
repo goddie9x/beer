@@ -45,7 +45,7 @@
                             <a class="nav-link" aria-current="page" href="{{ url('/') }}">Triending</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('frontend.threshold') }}">Alert</a>
+                            <a class="nav-link" href="{{ route('frontend.alert') }}">Alert</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">Report</a>

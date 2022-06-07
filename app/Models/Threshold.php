@@ -10,7 +10,7 @@ class Threshold extends Model
     protected $table = 'Threshold';
     protected $primaryKey = 'id';
     public $timestamps = false;
-    public function getAllThresHoldInfo()
+    public function getAllThresholdInfo()
     {
         return $this->join('Device', 'Device.DeviceID', '=', 'Threshold.DeviceID')
             ->select('Threshold.*', 'Device.Dev_Name', 'Device.Dev_Unit')
