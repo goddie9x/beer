@@ -178,7 +178,6 @@
                         "_token": "{{ csrf_token() }}",
                     },
                     success: function(data) {
-                        $('.loading-modal').click();
                         getChartBtn.removeClass('disabled');
                         charts = [];
                         for (const [key, value] of Object.entries(data)) {
@@ -186,15 +185,16 @@
                             charts.push(chart);
                         }
                         setChartsRow();
+                        $('.loading-modal').click();
                     },
                     error: function(data) {
-                        $('.loading-modal').click();
                         getChartBtn.removeClass('disabled');
                         showToast({
-                            type: 'danger',
+                            type: AlertTypes.DANGER,
                             title: 'Lỗi',
                             message: 'Không thể lấy dữ liệu',
                         });
+                        $('.loading-modal').click();
                     }
                 });
             }

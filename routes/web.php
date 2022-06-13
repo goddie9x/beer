@@ -20,8 +20,13 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'/* ,'middleware'=>'loginAdmi
 Route::group(['namespace'=>'frontend'],function(){
     Route::get('/', 'IndexController@index');
     Route::get('/alert', 'AlertController@index')->name('frontend.alert');
-    Route::get('/threshold', 'AlertController@getAllThreshold')->name('frontend.threshold');
-    Route::post('/setThreshold', 'AlertController@setThreshold')->name('frontend.setThreshold');
+    Route::get('/emailsForAlert', 'AlertController@GetAllEmailsForAlert')->name('frontend.alert.emailsForAlert');
+    Route::post('/emailsForAlert', 'AlertController@ChangeActiveEmail')->name('frontend.alert.emailsForAlert');
+    Route::get('/emailsForAlert', 'AlertController@GetAllEmailsForAlert')->name('frontend.alert.emailsForAlert');
+    Route::get('/addEmailForAlert', 'AlertController@getAddEmailView')->name('frontend.alert.addEmailForAlert');
+    Route::post('/addEmailForAlert', 'AlertController@SetEmailsForAlert')->name('frontend.alert.setEmailsForAlert');
+    Route::get('/threshold', 'AlertController@getAllThreshold')->name('frontend.alert.threshold');
+    Route::post('/setThreshold', 'AlertController@setThreshold')->name('frontend.alert.setThreshold');
     Route::post('/', 'IndexController@getAnalog')->name('frontend.getAnalog');
 });
 

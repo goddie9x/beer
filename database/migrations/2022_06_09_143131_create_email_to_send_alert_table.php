@@ -13,14 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('Alert', function (Blueprint $table) {
+        Schema::create('email_to_send_alert', function (Blueprint $table) {
             $table->id();
-            $table->string('DeviceID');
-            $table->string('message')->nullable();
-            $table->string('status');
-            $table->float('value');
-            $table->float('outThreshold');
-            $table->datetime('created_at');
+            $table->string('email');
+            $table->string('name');
+            $table->boolean('active')->default(false);
         });
     }
 
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('alert');
+        Schema::dropIfExists('email_to_send_alert');
     }
 };

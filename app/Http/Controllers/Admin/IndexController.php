@@ -20,7 +20,7 @@ class IndexController extends Controller
     }
     public function initThreshold(){
         Threshold::truncate();
-        $devicesInfoForThreadhold = Device::select('DeviceID','Dev_Unit')->get()->toArray();
+        $devicesInfoForThreadhold = Device::select('DeviceID')->get()->toArray();
         Threshold::insert($devicesInfoForThreadhold);
     }
 }

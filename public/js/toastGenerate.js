@@ -1,3 +1,16 @@
+const AlertTypes = {
+    SUCCESS: 'success',
+    INFO: 'info',
+    WARNING: 'warning',
+    DANGER: 'danger'
+}
+const IconAlertList = {
+    success: '<i class="fas fa-check-circle"></i>',
+    danger: '<i class="fas fa-exclamation-circle"></i>',
+    warning: '<i class="fas fa-exclamation-triangle"></i>',
+    info: '<i class="fas fa-info-circle"></i>'
+}
+
 function showToast({ type, title, message }, timeout = 6000, container = '.toasts-container') {
     let isClosed = false;
     let toastContainer = document.querySelector(container);
@@ -10,7 +23,7 @@ function showToast({ type, title, message }, timeout = 6000, container = '.toast
     });
     toast.className = 'alert alert-' + type;
     toast.innerHTML = `<div class="alert-heading">
-    <strong class="mr-auto">${title}</strong>
+    <strong class="mr-auto">${IconAlertList[type]} ${ title}</strong>
     </div>
     <div class="alert-body">
     ${message}

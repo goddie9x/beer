@@ -101,20 +101,6 @@
     <script src="{{ URL::asset('js/toastGenerate.js') }}"></script>
     <script src="{{ URL::asset('js/index.js') }}"></script>
     @yield('js')
-    <script>
-        setActiveNav();
-        function setActiveNav(){
-            $('.nav-link').removeClass('active');
-            const url = window.location.href;
-            const urlWithoutLastSlash = url.substring(0, url.length - 1);
-            const nav_itemsWithoutSlash = $('a[href="'+urlWithoutLastSlash+'"]');
-            const nav_items = $('a[href="'+url+'"]');
-            nav_itemsWithoutSlash.addClass('active');
-            nav_itemsWithoutSlash.parent('.nav-link').addClass('active');
-            nav_items.addClass('active');
-            nav_items.parent('.nav-link').addClass('active');
-        }
-    </script>
 </body>
 
 </html>

@@ -108,7 +108,7 @@ class Chart {
         }).catch(function(error) {
             _this.hideLoading();
             showToast({
-                type: 'danger',
+                type: AlertTypes.DANGER,
                 title: 'Lỗi',
                 message: 'Không thể lấy dữ liệu',
             });

@@ -55,7 +55,7 @@
             let index = $('#threshold').val()-1;
             if (index>=0) {
                 $.ajax({
-                    url: '{{ route('frontend.setThreshold') }}',
+                    url: '{{ route('frontend.alert.setThreshold') }}',
                     type: 'POST',
                     data: {
                         id: thresholdsInfo[index].id,
