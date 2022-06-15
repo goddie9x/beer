@@ -18,10 +18,9 @@ class MailNotify extends Mailable
      * @return void
      */
     public function __construct($data)
-   {
-       $this->data = $data;
-   }
-
+    {
+        $this->data = $data;
+    }
 
     /**
      * Build the message.
@@ -31,8 +30,7 @@ class MailNotify extends Mailable
     public function build()
     {
         return $this->from(env('MAIL_FROM_ADDRESS'))
-            ->subject('Cảnh báo')
-            ->view('mails.notify')
-           ->subject('Notification email');
+            ->subject('Warning, the device is out of threshold')
+            ->view('mails.notify');
     }
 }

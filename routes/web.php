@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::group(['prefix'=>'admin','namespace'=>'Admin'/* ,'middleware'=>'loginAdmin' */],function(){
+Auth::routes();
+
+Route::group(['prefix'=>'administrator','namespace'=>'Admin'/* ,'middleware'=>'loginAdmin' */],function(){
     Route::get('/', 'IndexController@index')->name('admin');
     Route::post('/initAllUnit', 'IndexController@initAllUnit')->name('admin.initAllUnit');
     Route::post('/initThreshold', 'IndexController@initThreshold')->name('admin.initThreshold');
@@ -25,9 +27,8 @@ Route::group(['namespace'=>'frontend'],function(){
     Route::get('/emailsForAlert', 'AlertController@GetAllEmailsForAlert')->name('frontend.alert.emailsForAlert');
     Route::get('/addEmailForAlert', 'AlertController@getAddEmailView')->name('frontend.alert.addEmailForAlert');
     Route::post('/addEmailForAlert', 'AlertController@SetEmailsForAlert')->name('frontend.alert.setEmailsForAlert');
+    Route::post('/deleteEmail', 'AlertController@deleteEmail')->name('frontend.alert.deleteEmail');
     Route::get('/threshold', 'AlertController@getAllThreshold')->name('frontend.alert.threshold');
     Route::post('/setThreshold', 'AlertController@setThreshold')->name('frontend.alert.setThreshold');
     Route::post('/', 'IndexController@getAnalog')->name('frontend.getAnalog');
 });
-
-Auth::routes();

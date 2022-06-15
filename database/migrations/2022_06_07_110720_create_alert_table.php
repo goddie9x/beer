@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('Alert', function (Blueprint $table) {
             $table->id();
             $table->string('DeviceID');
+            $table->string('device_name');
             $table->string('message')->nullable();
             $table->string('status');
             $table->float('value');

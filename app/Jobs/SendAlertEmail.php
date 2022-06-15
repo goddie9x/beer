@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class SendAlertEmail implements ShouldQueue
 {
@@ -34,7 +35,7 @@ class SendAlertEmail implements ShouldQueue
     public function handle()
     {
         foreach ($this->users as $user) {
-            Mail::to($user->email)->send(new MailNotify($this->data));
+            Mail::to($user['email'])->send(new MailNotify($this->data));
         }
     }
 }

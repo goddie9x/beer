@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('email');
             $table->string('name');
-            $table->boolean('active')->default(false);
+            $table->boolean('active')->default(true);
         });
     }
 

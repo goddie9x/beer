@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('unit', function (Blueprint $table) {
             $table->id();
-            $table->tinytext('describe_vi');
-            $table->tinytext('describe_en');
-            $table->tinytext('Dev_Unit');
+            $table->tinytext('describe_vi')->nullable();
+            $table->tinytext('describe_en')->nullable();
+            $table->tinytext('Dev_Unit')->nullable();
         });
     }
 

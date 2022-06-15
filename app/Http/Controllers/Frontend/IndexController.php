@@ -33,7 +33,7 @@ class IndexController extends Controller
     {
         $timeStart = $request->timeStart;
         $timeEnd = $request->timeEnd;
-        if($timeEnd == ''){
+        if(!$timeEnd){
             $timeEnd = date('Y-m-d H:i:s');
         }
         $period = strtotime($timeEnd) - strtotime($timeStart);

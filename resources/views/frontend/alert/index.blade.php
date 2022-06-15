@@ -6,7 +6,7 @@
         <div class="row">
             @foreach ($alerts as $alert)
                 <div class="col-12 col-md-6 col-lg-4 alert-item my-2">
-                    @include('emails.notify', ['data' => $alert])
+                    @include('mails.notify', ['data' => $alert])
                 </div>
             @endforeach
         </div>

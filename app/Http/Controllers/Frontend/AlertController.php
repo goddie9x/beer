@@ -22,9 +22,7 @@ class AlertController extends Controller
     }
     public function index()
     {
-        $alerts = Alert::join('Device', 'Device.DeviceID', '=', 'Alert.DeviceID')
-            ->select('Alert.*', 'Device.name as device_name')
-            ->orderBy('alerts.created_at', 'desc')
+        $alerts = Alert::orderBy('created_at', 'desc')
             ->paginate(10);
         return view('frontend.alert.index', compact('alerts'));
     }
