@@ -23,7 +23,7 @@ class AlertController extends Controller
     public function index()
     {
         $alerts = Alert::orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(12);
         return view('frontend.alert.index', compact('alerts'));
     }
     public function getAllThreshold()

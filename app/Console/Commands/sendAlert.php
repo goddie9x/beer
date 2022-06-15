@@ -27,18 +27,21 @@ class sendAlert extends Command
     protected $description = 'Send alert email';
     private function SendEmail($device_name, $message, $status, $value, $outThreshold, $created_at)
     {
-        $messages = new stdClass();
-        $messages->device_name = $device_name;
-        $messages->message = $message;
-        $messages->status = $status;
-        $messages->value = $value;
-        $messages->outThreshold = $outThreshold;
-        $messages->created_at = $created_at;
+        $messages = (object) [
+            'is_mailing' => true,
+            'device_name' => $device_name,
+            'message' => $message,
+            'status' => $status,
+            'value' => $value,
+            'outThreshold' => $outThreshold,
+            'created_at' => $created_at,
+        ];
+
         $emails = EmailForAlert::select('email')
             ->where('active', '=', true)
             ->get();
         if (count($emails) > 0) {
-            foreach($emails as $email){
+            foreach ($emails as $email) {
                 Mail::to($email)->send(new MailNotify($messages));
             }
         }
@@ -75,21 +78,21 @@ class sendAlert extends Command
         $t_delta_floor = $analogData['t_delta_floor'];
 
         if ($is_warning == true) {
-            if (($analogData->current_warning_type == 0 && $value > $t_ceil + $t_delta_ceil) || ($analogData->current_warning_type == true && $value < $t_floor - $t_delta_floor)) {
-                Threshold::where('DeviceID', '=', $analogData->DeviceID)->update(['is_warning' => 0]);
+            if (($analogData->current_warning_type == false && $value < $t_ceil - $t_delta_ceil) || ($analogData->current_warning_type == true && $value > $t_floor + $t_delta_floor)) {
+                Threshold::where('DeviceID', '=', $analogData->DeviceID)->update(['is_warning' => false]);
                 return;
             }
         } else {
-            if ($value < $t_ceil) {
+            if ($value > $t_ceil) {
                 Threshold::where('DeviceID', $analogData->DeviceID)->update(['is_warning' => true, 'current_warning_type' => false]);
-                $this->CreateAlert($analogData->DeviceID, $analogData->Dev_Name, 'The device ' . $analogData->Dev_Name . ' is out of threshold', 'lower than ', $value, $t_ceil, $analogData->Recordtime);
-                $this->SendEmail($analogData->Dev_Name, 'The device ' . $analogData->Dev_Name . ' is out of threshold', 'lower than ', $value, $t_ceil, $analogData->Recordtime);
+                $this->CreateAlert($analogData->DeviceID, $analogData->Dev_Name, 'The device ' . $analogData->Dev_Name . ' is out of threshold', 'upper than ', $value, $t_ceil, $analogData->Recordtime);
+                $this->SendEmail($analogData->Dev_Name, 'The device ' . $analogData->Dev_Name . ' is out of threshold', 'upper than ', $value, $t_ceil, $analogData->Recordtime);
                 return;
             }
-            if ($value > $t_floor) {
+            if ($value < $t_floor) {
                 Threshold::where('DeviceID', $analogData->DeviceID)->update(['is_warning' => true, 'current_warning_type' => true]);
-                $this->CreateAlert($analogData->DeviceID, $analogData->Dev_Name, 'The device ' . $analogData->Dev_Name . ' is out of threshold', 'upper than ', $value, $t_floor, $analogData->Recordtime);
-                $this->SendEmail($analogData->Dev_Name, 'The device ' . $analogData->Dev_Name . ' is out of threshold', 'upper than ', $value, $t_floor, $analogData->Recordtime);
+                $this->CreateAlert($analogData->DeviceID, $analogData->Dev_Name, 'The device ' . $analogData->Dev_Name . ' is out of threshold', 'lower than ', $value, $t_floor, $analogData->Recordtime);
+                $this->SendEmail($analogData->Dev_Name, 'The device ' . $analogData->Dev_Name . ' is out of threshold', 'lower than ', $value, $t_floor, $analogData->Recordtime);
                 return;
             }
         }
