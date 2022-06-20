@@ -48,7 +48,7 @@
                             <a class="nav-link" href="{{ route('frontend.alert') }}">Alert</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Report</a>
+                            <a class="nav-link" href="{{route('frontend.report')}}">Report</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">Manual input</a>

@@ -22,6 +22,7 @@ Route::group(['prefix'=>'administrator','namespace'=>'Admin'/* ,'middleware'=>'l
 Route::group(['namespace'=>'frontend'],function(){
     Route::get('/', 'IndexController@index');
     Route::get('/alert', 'AlertController@index')->name('frontend.alert');
+    Route::post('/', 'IndexController@getAnalog')->name('frontend.getAnalog');
     Route::get('/emailsForAlert', 'AlertController@GetAllEmailsForAlert')->name('frontend.alert.emailsForAlert');
     Route::post('/emailsForAlert', 'AlertController@ChangeActiveEmail')->name('frontend.alert.emailsForAlert');
     Route::get('/emailsForAlert', 'AlertController@GetAllEmailsForAlert')->name('frontend.alert.emailsForAlert');
@@ -30,5 +31,6 @@ Route::group(['namespace'=>'frontend'],function(){
     Route::post('/deleteEmail', 'AlertController@deleteEmail')->name('frontend.alert.deleteEmail');
     Route::get('/threshold', 'AlertController@getAllThreshold')->name('frontend.alert.threshold');
     Route::post('/setThreshold', 'AlertController@setThreshold')->name('frontend.alert.setThreshold');
-    Route::post('/', 'IndexController@getAnalog')->name('frontend.getAnalog');
+    Route::get('/report', 'ReportController@index')->name('frontend.report');
+    Route::post('/report', 'ReportController@GetFileByPath')->name('frontend.report.getFileByPath');
 });
