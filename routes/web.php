@@ -13,9 +13,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Auth::routes();
-
+Admin::routes();
 Route::group(['prefix'=>'administrator','namespace'=>'Admin'/* ,'middleware'=>'loginAdmin' */],function(){
-    Route::get('/', 'IndexController@index')->name('admin');
+    Route::get('/', 'HomeController@index')->name('home');
+    Route::get('/cus', 'IndexController@index')->name('admin');
     Route::post('/initAllUnit', 'IndexController@initAllUnit')->name('admin.initAllUnit');
     Route::post('/initThreshold', 'IndexController@initThreshold')->name('admin.initThreshold');
 });
@@ -33,4 +34,5 @@ Route::group(['namespace'=>'frontend'],function(){
     Route::post('/setThreshold', 'AlertController@setThreshold')->name('frontend.alert.setThreshold');
     Route::get('/report', 'ReportController@index')->name('frontend.report');
     Route::post('/report', 'ReportController@GetFileByPath')->name('frontend.report.getFileByPath');
+    Route::get('/report/export', 'ReportController@export')->name('frontend.report.export');
 });

@@ -56,13 +56,18 @@
             });
     }
     $('.start-download').unbind().click(function() {
-        const path = $('#file-name').val();
-        const fileName = $('#file-select').val();
-        if (path == '') {
+        const selectElement = document.getElementById('file-select');
+        const filePath = selectElement.value;
+        let fileName = document.getElementById('file-name').value;
+        if (filePath == '') {
             alert('Chưa chọn file');
             return;
         }
-        downloadExcelFile(path, fileName);
+        if(fileName == ''){
+            fileName = filePath.split('/').pop();
+        }
+        fileName+='.xlsx';
+        downloadExcelFile(filePath, fileName);
     });
 </script>
 @endsection

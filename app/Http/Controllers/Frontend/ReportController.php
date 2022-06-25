@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -22,7 +24,7 @@ class ReportController extends Controller
     public function GetFileByPath(Request $request)
     {
         $path = $request->path;
-        $name = $request->name||'test.xlsx';
+        $name = $request->name;
         $headers = [
                 'Content-Type'              => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'Content-Length'            => filesize($path),
@@ -31,5 +33,9 @@ class ReportController extends Controller
                 'Content-Disposition'       => 'attachment; filename="'.$name.'"'
         ];
         return response()->download($path, $name, $headers);
+    }
+    public function export() 
+    {
+        return new UsersExport('test.xlsx');
     }
 }
