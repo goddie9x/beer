@@ -14,7 +14,11 @@ use Illuminate\Support\Facades\Route;
 */
 Auth::routes();
 Admin::routes();
-Route::group(['prefix'=>'administrator','namespace'=>'Admin'/* ,'middleware'=>'loginAdmin' */],function(){
+Route::group([
+    'prefix'        => config('admin.route.prefix'),
+    'namespace'     => config('admin.route.namespace'),
+    'middleware'    => config('admin.route.middleware'),
+], function () {
     Route::get('/', 'HomeController@index')->name('home');
     Route::get('/cus', 'IndexController@index')->name('admin');
     Route::post('/initAllUnit', 'IndexController@initAllUnit')->name('admin.initAllUnit');
