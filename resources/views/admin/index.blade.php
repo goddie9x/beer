@@ -1,4 +1,4 @@
-@extends('admin.layout.main')
+@extends('admin::index')
 @section('css')
     <link rel="stylesheet" href="{{ URL::asset('css/home.css') }}" type="text/css">
 @endsection

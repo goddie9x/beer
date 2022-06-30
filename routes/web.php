@@ -13,17 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Auth::routes();
-Admin::routes();
-Route::group([
-    'prefix'        => config('admin.route.prefix'),
-    'namespace'     => config('admin.route.namespace'),
-    'middleware'    => config('admin.route.middleware'),
-], function () {
-    Route::get('/', 'HomeController@index')->name('home');
-    Route::get('/cus', 'IndexController@index')->name('admin');
-    Route::post('/initAllUnit', 'IndexController@initAllUnit')->name('admin.initAllUnit');
-    Route::post('/initThreshold', 'IndexController@initThreshold')->name('admin.initThreshold');
-});
 Route::group(['namespace'=>'frontend'],function(){
     Route::get('/', 'IndexController@index');
     Route::get('/alert', 'AlertController@index')->name('frontend.alert');
@@ -40,3 +29,15 @@ Route::group(['namespace'=>'frontend'],function(){
     Route::post('/report', 'ReportController@GetFileByPath')->name('frontend.report.getFileByPath');
     Route::get('/report/export', 'ReportController@export')->name('frontend.report.export');
 });
+Admin::routes();
+Route::group([
+    'prefix'        => config('admin.route.prefix'),
+    'namespace'     => config('admin.route.namespace'),
+    'middleware'    => config('admin.route.middleware'),
+], function () {
+    Route::get('/', 'HomeController@index')->name('home');
+    Route::get('/cus', 'IndexController@index')->name('admin');
+    Route::post('/initAllUnit', 'IndexController@initAllUnit')->name('admin.initAllUnit');
+    Route::post('/initThreshold', 'IndexController@initThreshold')->name('admin.initThreshold');
+});
+

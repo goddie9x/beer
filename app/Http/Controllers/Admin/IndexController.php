@@ -6,16 +6,16 @@ use App\Models\Device;
 use App\Models\Threshold;
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use Encore\Admin\Layout\Content;
 
 class IndexController extends Controller
 {
-    public function __construct()
+    public function index(Content $content)
     {
-        $this->middleware('auth');
-    }
-    public function index()
-    {
-        return view('admin.index');
+        return $content
+            ->title('Initial data')
+            ->description($this->description['index'] ?? trans('admin.list'))
+            ->view('admin.index');
     }
     public function initAllUnit(){
        Unit::truncate();
