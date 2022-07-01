@@ -42,7 +42,8 @@ class IndexController extends Controller
         if ($period < 0) {
             return response()->json($data);
         }
-        $execProcedureString = "EXEC get_time_dialog_full @timeStart = '".$timeStart."',@timeEnd = '".$timeEnd."' ";
+        $procedureName = GetProcedureTimeDialog($period);
+        $execProcedureString = "EXEC ".$procedureName." @timeStart = '".$timeStart."',@timeEnd = '".$timeEnd."' ";
         if($request->device != ''){
             $execProcedureString.=',@DeviceID = '.$request->device.' ';
         }
@@ -62,10 +63,8 @@ class IndexController extends Controller
             if (isset($data[$device_name])) {
                 $time = $tempDeviceInfo['Recordtime'];
                 $timeToSeconds = strtotime($time);
-                if (periodConditionHandle($timeToSeconds, $period)) {
-                    array_push($data[$device_name]['values'], $tempDeviceInfo['Value']);
-                    array_push($data[$device_name]['times'], $time);
-                }
+                array_push($data[$device_name]['values'], $tempDeviceInfo['Value']);
+                array_push($data[$device_name]['times'], $time);
             } else {
                 $device_id = $tempDeviceInfo['DeviceID'];
                 $data[$device_name] = [
@@ -85,21 +84,19 @@ class IndexController extends Controller
         return response()->json($data);
     }
 }
-function periodConditionHandle($time, $period)
+function GetProcedureTimeDialog($period)
 {
-    $damage = 0;
-    if ($period < 7200) {
-        $damage = $time % 60;
-        return $damage >= 10 && $damage <= 30;
+    if ($period < 3600) {
+        return 'get_time_dialog_full';
     }
-    if ($period < 86400) {
-        $damage = $time % 1800;
-        return $damage >= 10 && $damage <= 30;
+    if($period < 21600){
+        return 'get_time_dialog_per_hour_full';
     }
-    if ($period < 604800) {
-        $damage = $time % 7200;
-        return $damage >= 10 && $damage <= 30;
+    if ($period < 259200) {
+        return 'get_time_dialog_per_day_full';
     }
-    $damage = $time % 43200;
-    return $damage >= 10 && $damage <= 30;
+    if ($period < 5184000) {
+        return 'get_time_dialog_per_month_full';
+    }
+    return 'get_time_dialog_per_year_full';
 }
