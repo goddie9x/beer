@@ -75,7 +75,6 @@ class IndexController extends Controller
                     'name' => $device_name,
                     'deviceId' => $device_id,
                     'description' => $tempDeviceInfo['Dev_Des'],
-                    'timeInterval' => floor($period / 9) * 1000,
                     'ceil' => $tempDeviceInfo['t_ceil'],
                     'floor' => $tempDeviceInfo['t_floor'],
                 ];

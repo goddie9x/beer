@@ -61,17 +61,17 @@ class Chart {
         this.optionPeriodElement.addEventListener('change', function(e) {
             if (e.target.value < 0) return;
             let period = PeriodByTimestampMilisecond[e.target.value];
-            let newDateStart = (new Date(_this.dateStart)).getTime() + 25200000;
+            let newDateStart = Date.parse(_this.dateStart) + 25200000;
             let newDateEndTimestamp = newDateStart + period;
             let newDateEnd = new Date(newDateEndTimestamp);
             newDateStart = new Date(newDateStart);
             _this.handleChangePeriod(newDateStart, newDateEnd);
         });
         this.zoomOutBtn.addEventListener('click', function(e) {
-            //the timeInterval is the part of interval in xAsix, by default it's 1/9 time of period
-            let period = _this.timeInterval * 81;
+            //the timeInterval is the part of interval in xAsix, by default it's 1/12 time of period
+            let period = _this.timeInterval * 144;
             if (period <= 31536000000) {
-                let newDateStart = (new Date(_this.dateStart)).getTime() + 25200000 - period / 2;
+                let newDateStart = Date.parse(_this.dateStart) + 25200000 - period / 2;
                 let newDateEndTimestamp = newDateStart + period;
                 let newDateEnd = new Date(newDateEndTimestamp);
                 newDateStart = new Date(newDateStart);
@@ -98,12 +98,13 @@ class Chart {
                 device: _this.deviceId,
                 _token: csrf_token,
             })
-        }).then(function(response) {
+        }).then((response) => {
             return response.json();
-        }).then(function(data) {
+        }).then((data) => {
             _this.setChartData(data[_this.name]);
             _this.currentChart = _this.initChart();
-            _this.currentChart.redraw();
+            //_this.currentChart.redraw();
+            _this.currentChart.update({});
             _this.hideLoading();
         }).catch(function(error) {
             _this.hideLoading();
@@ -145,9 +146,8 @@ class Chart {
                 type: 'datetime',
                 labels: {
                     overflow: 'justify',
-                    format: '{value:%b-%e %l:%M %p }',
+                    format: this.dateFormat,
                 },
-                relativeXValue: true
             },
             yAxis: {
                 title: {
@@ -190,7 +190,7 @@ class Chart {
                  }], */
                 plotLines: [{
                         //low threshold
-                        value: parseFloat(this.floor),
+                        value: this.floor,
                         width: 2,
                         color: 'blue',
                         label: {
@@ -202,7 +202,7 @@ class Chart {
                     },
                     {
                         //high threshold
-                        value: parseFloat(this.ceil),
+                        value: this.ceil,
                         width: 2,
                         color: 'red',
                         label: {
@@ -229,8 +229,8 @@ class Chart {
                         enabled: false
                     },
                     pointInterval: this.timeInterval,
-                    //pointStart: new Date(this.dateStart),
-                    relativeXValue: true
+                    pointStart: Date.parse(this.dateStart),
+                    //relativeXValue: true,
                 },
                 series: {
                     cursor: 'pointer',
@@ -245,11 +245,11 @@ class Chart {
                                 _this.handleChangePeriod(newDateStart, newDateEnd);
                             }
                         }
-                    }
+                    },
                 }
             },
             series: [{
-                name: this.description,
+                name: this.description + ' từ ' + new Date(this.dateStart).toLocaleString() + ' đến ' + new Date(this.dateEnd).toLocaleString(),
                 data: this.chartSeriesXY
             }],
             navigation: {
@@ -289,10 +289,8 @@ class Chart {
         deviceId,
         object,
         description,
-        timeInterval,
         ceil,
         floor,
-        //threshold,
     }) {
         this.name = name;
         this.deviceId = deviceId;
@@ -300,8 +298,11 @@ class Chart {
         this.description = description;
         this.unit = unitList[unit].unit;
         this.unitName = unitList[unit].name;
-        this.timeInterval = timeInterval;
         this.dateStart = times[0];
+        this.dateEnd = times[times.length - 1];
+        this.period = Date.parse(this.dateEnd) - Date.parse(this.dateStart);
+        this.setTimeInterval();
+        this.setDateFormat();
         if (values.length != times.length) {
             console.log('Error: values and times must have the same length');
             return false;
@@ -309,9 +310,31 @@ class Chart {
         this.chartSeriesXY = this.getChartSerialXYWithTimeAndValue(values, times);
         this.unit = unitList[unit].unit;
         this.unitName = unitList[unit].name;
-        this.ceil = ceil;
-        this.floor = floor;
+        this.ceil = parseFloat(ceil).toFixed(2);
+        this.floor = parseFloat(floor).toFixed(2);
         return true;
+    }
+    setTimeInterval() {
+        const period = this.period;
+        if (period < 21600000) {
+            this.timeInterval = Math.ceil(period / 12);
+        } else if (period < 345600000) {
+            this.timeInterval = Math.ceil(period / 24);
+        } else if (period < 5184000000) {
+            this.timeInterval = Math.ceil(period / 30);
+        } else {
+            this.timeInterval = Math.ceil(period / 12);
+        }
+    }
+    setDateFormat() {
+        const period = this.period;
+        if (period < 3600000) {
+            this.dateFormat = '{value:%l:%M %p}';
+        } else if (period < 2419200000) {
+            this.dateFormat = '{value:%l:%M %p %e}';
+        } else {
+            this.dateFormat = '{value:%l:%M %p %e-%b}';
+        }
     }
     removeChartData(index) {
         this.currentChart.series[index].remove(false);
