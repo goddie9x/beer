@@ -157,37 +157,6 @@ class Chart {
                 minorGridLineWidth: 0,
                 gridLineWidth: 0,
                 alternateGridColor: null,
-                /*  plotBands: [{ //  threshold floor
-                     from: parseFloat(this.min),
-                     to: parseFloat(this.floor),
-                     color: 'rgba(68, 170, 213, 0.1)',
-                     label: {
-                         text: 'Low',
-                         style: {
-                             color: '#606060'
-                         }
-                     }
-                 }, { // Normal
-                     from: parseFloat(this.floor),
-                     to: parseFloat(this.ceil),
-                     color: 'rgba(0, 0, 0, 0)',
-                     label: {
-                         text: 'Normal',
-                         style: {
-                             color: '#606060'
-                         }
-                     }
-                 }, { // Threshold ceil
-                     from: parseFloat(this.ceil),
-                     to: parseFloat(this.max),
-                     color: 'rgba(68, 170, 213, 0.1)',
-                     label: {
-                         text: 'High',
-                         style: {
-                             color: '#606060'
-                         }
-                     }
-                 }], */
                 plotLines: [{
                         //low threshold
                         value: this.floor,
