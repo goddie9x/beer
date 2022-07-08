@@ -1,94 +1,211 @@
 @extends('frontend.layout.main')
 @section('content')
-<div class="container">
-    <div class="select-threshold">
-        <div class="form-group my-2">
-            <label for="threshold">Threshold</label>
-            <select class="form-control select2 without-location" id="threshold" name="object">
-                <option value="">Select threshold</option>
-                @foreach ($thresholds as $threshold)
-                    <option value="{{ $threshold->id }}">{{ $threshold->Dev_Name }}</option>
-                @endforeach
-            </select>
-        </div>
+    <div class="container my-4">
+        <table class="threshold-table bg-dark table-bordered align-middle table-dark table-striped w-100">
+            <thead class="table-header">
+                <tr>
+                    <th class="p-2 text-center" scope="col">#</th>
+                    <th class="p-2 text-center" scope="col">Device name</th>
+                    <th class="p-2 text-center" scope="col">ceil</th>
+                    <th class="p-2 text-center" scope="col">delta ceil</th>
+                    <th class="p-2 text-center" scope="col">floor</th>
+                    <th class="p-2 text-center" scope="col">delta floor</th>
+                    <th class="p-2 text-center" scope="col">Unit</th>
+                    <th class="p-2 text-center" scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody class="list-threshold">
+                
+            </tbody>
+        </table>
     </div>
-    <div class="set-threshold-option">
-        <div class="form-group my-2">
-            <label for="threshold_ceil">Threshold ceil</label>
-            <input type="number" class="form-control" id="threshold_ceil" name="t_ceil" placeholder="Nhập giá trị threshold">
-        </div>
-        <div class="form-group my-2">
-            <label for="threshold_delta_ceil">Threshold delta ceil</label>
-            <input type="number" class="form-control" id="threshold_delta_ceil" name="t_delta_ceil" placeholder="Nhập giá trị threshold">
-        </div>
-        <div class="form-group my-2">
-            <label for="threshold_floor">Threshold floor</label>
-            <input type="number" class="form-control" id="threshold_floor" name="t_floor" placeholder="Nhập giá trị threshold">
-        </div>
-        <div class="form-group my-2">
-            <label for="threshold_delta_floor">Threshold delta floor</label>
-            <input type="number" class="form-control" id="threshold_delta_floor" name="t_delta_floor" placeholder="Nhập giá trị threshold">
-        </div>
-    </div>
-    <div class="btn btn-primary set-threshold-btn">Set</div>
-</div>
 @endsection
 @section('js')
-<script>
-    let thresholdsInfo = <?php echo json_encode($thresholds); ?>;
-    $(document).ready(function () {
-        $('.set-threshold-option').hide();
-        $('.select2').select2();
-        $('#threshold').change(function () {
-            let index = $(this).val()-1;
-            if (index>=0) {
-                $('.set-threshold-option').show();
-                $('#threshold_ceil').val(thresholdsInfo[index].t_ceil);
-                $('#threshold_delta_ceil').val(thresholdsInfo[index].t_delta_ceil);
-                $('#threshold_floor').val(thresholdsInfo[index].t_floor);
-                $('#threshold_delta_floor').val(thresholdsInfo[index].t_delta_floor);
-            } else {
-                $('.set-threshold-option').hide();
+    <script>
+        let thresholdsInfo = <?php echo json_encode($thresholds); ?>;
+        class Threshold {
+            constructor(container = '.list-threshold', {
+                index,
+                id,
+                name,
+                ceil,
+                delta_ceil,
+                floor,
+                delta_floor,
+                unit,
+            }) {
+                this.id = id;
+                this.name = name;
+                this.ceil = ceil;
+                this.delta_ceil = delta_ceil;
+                this.floor = floor;
+                this.delta_floor = delta_floor;
+                this.unit = unit;
+                this.container = container;
+                this.init();
             }
-        });
-        $('.set-threshold-btn').click(function () {
-            let index = $('#threshold').val()-1;
-            if (index>=0) {
+            init() {
+                this.mainElementName = 'thresh-' + this.id;
+                this.mainElement = document.createElement('tr');
+                this.mainElement.classList.add(this.mainElementName);
+                this.mainElement.classList.add('text-center');
+                $(this.container).append(this.mainElement);
+                this.render();
+            }
+            render() {
+                let mainElementClassSelector = '.'+this.mainElementName;
+                this.mainElement.innerHTML = `
+                <th class="p-1 text-center" scope="row">${this.id}</th>
+                <td class="p-1 text-center threshold-name">${this.name}</td>
+                `;
+                if(this.isEdit){
+                    this.mainElement.innerHTML += `
+                    <td class="p-1 text-center">
+                        <input type="number" class="form-control threshold-ceil" value="${this.ceil}">
+                    </td>
+                    <td class="p-1 text-center">
+                        <input type="number" class="form-control threshold-delta-ceil" value="${this.delta_ceil}">
+                    </td>
+                    <td class="p-1 text-center">
+                        <input type="number" class="form-control threshold-floor" value="${this.floor}">
+                    </td>
+                    <td class="p-1 text-center">
+                        <input type="number" class="form-control threshold-delta-floor" value="${this.delta_floor}">
+                    </td>
+                    <td class="p-1 text-center">
+                        ${this.unit}
+                    </td>
+                    <td class="text-center">
+                        <div class="p-1 d-flex">
+                            <div class="btn btn-success mx-1 btn-sm btn-save-threshold">Save</div>
+                            <div class="btn btn-danger mx-1 btn-sm btn-cancel-threshold">Cancel</div>
+                        </div>
+                    </td>
+                    `;
+                }
+                else{
+                    this.mainElement.innerHTML += `
+                    <td class="p-1 text-center">${this.ceil??''}</td>
+                    <td class="p-1 text-center">${this.delta_ceil??''}</td>
+                    <td class="p-1 text-center">${this.floor??''}</td>
+                    <td class="p-1 text-center">${this.delta_floor??''}</td>
+                    <td class="p-1 text-center">${this.unit??''}</td>
+                    <td class="p-1 text-center">
+                        <div class="btn btn-primary btn-sm btn-edit-threshold">Edit</div>
+                    </td>
+                    `;
+                }
+                this.initEventHandle();
+            }
+            initEventHandle(){
+                let mainElementClassSelector = '.'+this.mainElementName;
+                $(mainElementClassSelector + ' .btn-edit-threshold').click(() => {
+                    this.isEdit = true;
+                    this.render();
+                });
+                $(mainElementClassSelector + ' .btn-save-threshold').click(() => {
+                    this.isEdit = false;
+                    this.save();
+                    this.render();
+                });
+                $(mainElementClassSelector + ' .btn-cancel-threshold').click(() => {
+                    this.isEdit = false;
+                    this.render();
+                });
+            }
+            edit() {
+                this.isEdit = true;
+                this.render();
+                this.addCancelBtn();
+            }
+            save() {
+                let mainElementClassSelector = '.'+this.mainElementName;
+                let t_ceil = $(mainElementClassSelector + ' .threshold-ceil').val();
+                let t_delta_ceil = $(mainElementClassSelector + ' .threshold-delta-ceil').val();
+                let t_floor = $(mainElementClassSelector + ' .threshold-floor').val();
+                let t_delta_floor = $(mainElementClassSelector + ' .threshold-delta-floor').val();
+                
+                if(t_ceil == '' || t_delta_ceil == '' || t_floor == '' || t_delta_floor == ''){
+                    showToast({
+                            type:'danger',
+                            title:'Error',
+                            message:'Please fill all fields'
+                            });
+                    return;
+                }
+                if(t_ceil < t_floor){
+                    showToast({
+                            type:'danger',
+                            title:'Error',
+                            message:'ceil must be greater than floor'
+                            });
+                    return;
+                }
                 $.ajax({
                     url: '{{ route('frontend.alert.setThreshold') }}',
                     type: 'POST',
                     data: {
-                        id: thresholdsInfo[index].id,
-                        t_ceil: $('#threshold_ceil').val(),
-                        t_delta_ceil: $('#threshold_delta_ceil').val(),
-                        t_floor: $('#threshold_floor').val(),
-                        t_delta_floor: $('#threshold_delta_floor').val(),
+                        id: this.id,
+                        t_ceil,
+                        t_delta_ceil,
+                        t_floor,
+                        t_delta_floor,
                         _token: '{{ csrf_token() }}'
                     },
-                    success: async function (res) {
+                    success: (res)=> {
                         if (res.success) {
-                            thresholdsInfo[index].t_ceil = $('#threshold_ceil').val();
-                            thresholdsInfo[index].t_delta_ceil = $('#threshold_delta_ceil').val();
-                            thresholdsInfo[index].t_floor = $('#threshold_floor').val();
-                            thresholdsInfo[index].t_delta_floor = $('#threshold_delta_floor').val();
                             showToast({
                                 title: 'Thành công',
                                 message: res.message,
                                 type: 'success'
                             });
+                            this.isEdit = false;
+                            this.ceil = t_ceil;
+                            this.delta_ceil = t_delta_ceil;
+                            this.floor = t_floor;
+                            this.delta_floor = t_delta_floor;
+                            this.render();
                         } else {
-                            showToast(
-                                {
-                                    title: 'Lỗi',
-                                    message: res.message,
-                                    type: 'error'
-                                }
-                            );
+                            showToast({
+                                title: 'Lỗi',
+                                message: res.message,
+                                type: 'error'
+                            });
                         }
                     }
                 });
+
             }
+        }
+        $(document).ready(function() {
+            thresholdsInfo.forEach((threshold,index) => {
+                let thresholdObj = {
+                    index:index,
+                    id: threshold.id,
+                    name: threshold.Dev_Name,
+                    ceil: threshold.t_ceil,
+                    delta_ceil: threshold.t_delta_ceil,
+                    floor: threshold.t_floor,
+                    delta_floor: threshold.t_delta_floor,
+                    unit: threshold.Dev_Unit,
+                    isEdit: false
+                };
+                new Threshold('.list-threshold', thresholdObj);
+            });
+            $(window).scroll(function() {
+                let tableHeader = document.querySelector('.table-header');
+                
+                if ($(window).scrollTop()> 150) {
+                    tableHeader.classList.add('position-sticky');
+                    tableHeader.classList.add('text-success');
+                    tableHeader.style.top = '55px';
+                }
+                else {
+                    tableHeader.classList.remove('position-sticky');
+                    tableHeader.classList.remove('text-success');
+                    tableHeader.style.top = '0px';
+                }
+            });
         });
-    });
-</script>
+    </script>
 @endsection
